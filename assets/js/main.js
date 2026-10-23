@@ -1,6 +1,7 @@
 /* ==========================================================================
-   李然 · 个人作品集 · 交互脚本
-   1) 主题切换   2) 滚动显现   3) 导航高亮   4) 移动菜单   5) 作品筛选
+   ovo-pwp · 个人作品集 · 交互脚本
+   1) 主题切换  2) 滚动显现  3) 导航高亮  4) 移动菜单  5) 作品筛选  6) 页脚年份
+   7) 阅读进度与背景视差  8) 统计数字滚动  9) 指针交互  10) 封面大图预览
    ========================================================================== */
 (function () {
   'use strict';
@@ -41,6 +42,7 @@
 
   /* ---------- 3. 导航高亮 + 顶栏状态 ---------- */
   var header = document.getElementById('siteHeader');
+  var readProgress = document.getElementById('readProgress');
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav a[href^="#"]'));
   var sections = navLinks
     .map(function (a) { return document.querySelector(a.getAttribute('href')); })
@@ -50,6 +52,18 @@
     var y = window.scrollY || window.pageYOffset;
 
     if (header) header.classList.toggle('is-scrolled', y > 8);
+
+    // 阅读进度条：0 → 1
+    if (readProgress) {
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      var p = max > 0 ? Math.min(Math.max(y / max, 0), 1) : 0;
+      readProgress.style.setProperty('--p', p.toFixed(4));
+    }
+
+    // 背景光斑的轻微视差，制造层次感
+    if (!prefersReduced) {
+      root.style.setProperty('--scrollShift', (-Math.min(y, 900) * 0.05).toFixed(2) + 'px');
+    }
 
     if (!sections.length) return;
 
@@ -176,4 +190,183 @@
   /* ---------- 6. 页脚年份 ---------- */
   var yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+  /* ---------- 7. 统计数字滚动计数 ---------- */
+  var statNums = Array.prototype.slice.call(document.querySelectorAll('.stats strong'));
+
+  function countUp(el) {
+    var target = parseInt(el.textContent.replace(/[^\d]/g, ''), 10);
+    if (isNaN(target) || target <= 0) return;
+
+    var duration = 950;
+    var startTime = null;
+
+    function step(now) {
+      if (startTime === null) startTime = now;
+      var t = Math.min((now - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+      el.textContent = String(Math.round(target * eased));
+      if (t < 1) window.requestAnimationFrame(step);
+      else el.textContent = String(target); // 收尾落在精确值上
+    }
+
+    el.textContent = '0';
+    window.requestAnimationFrame(step);
+  }
+
+  if (statNums.length && !prefersReduced && 'IntersectionObserver' in window) {
+    var statObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        countUp(entry.target);
+        statObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.4 });
+    statNums.forEach(function (el) { statObserver.observe(el); });
+  }
+
+  /* ---------- 8. 指针交互（光标光晕 / 卡片倾斜 / 磁性按钮） ---------- */
+  // 只在有精确指针的设备上启用，触屏与减少动效偏好下全部跳过
+  var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  if (finePointer && !prefersReduced) {
+    /* 8.1 光标柔光晕：平滑追随；指针停 500ms 后就停掉 rAF，不空转 */
+    var glow = document.getElementById('cursorGlow');
+    if (glow) {
+      var tX = window.innerWidth / 2;
+      var tY = window.innerHeight / 2;
+      var cX = tX;
+      var cY = tY;
+      var glowRaf = null;
+      var idleTimer = null;
+
+      function glowTick() {
+        cX += (tX - cX) * 0.15;
+        cY += (tY - cY) * 0.15;
+        glow.style.setProperty('--gx', cX.toFixed(1) + 'px');
+        glow.style.setProperty('--gy', cY.toFixed(1) + 'px');
+        glowRaf = window.requestAnimationFrame(glowTick);
+      }
+
+      window.addEventListener('pointermove', function (e) {
+        tX = e.clientX;
+        tY = e.clientY;
+
+        if (glowRaf === null) {
+          cX = tX; // 首次直接落位，避免从屏幕中心飞过来
+          cY = tY;
+          document.body.classList.add('has-pointer');
+          glowRaf = window.requestAnimationFrame(glowTick);
+        }
+
+        window.clearTimeout(idleTimer);
+        idleTimer = window.setTimeout(function () {
+          window.cancelAnimationFrame(glowRaf);
+          glowRaf = null;
+        }, 500);
+      }, { passive: true });
+    }
+
+    /* 8.2 作品卡片 3D 倾斜，最大 2.5°，克制 */
+    var MAX_TILT = 2.5;
+    projectList.forEach(function (card) {
+      card.addEventListener('pointermove', function (e) {
+        var r = card.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        var px = (e.clientX - r.left) / r.width - 0.5;
+        var py = (e.clientY - r.top) / r.height - 0.5;
+        card.style.setProperty('--ry', (px * MAX_TILT * 2).toFixed(2) + 'deg');
+        card.style.setProperty('--rx', (-py * MAX_TILT * 2).toFixed(2) + 'deg');
+      });
+      card.addEventListener('pointerleave', function () {
+        card.style.setProperty('--ry', '0deg');
+        card.style.setProperty('--rx', '0deg');
+      });
+    });
+
+    /* 8.3 磁性按钮：最大偏移 4px */
+    var MAGNET = 4;
+    Array.prototype.slice.call(document.querySelectorAll('.btn')).forEach(function (btn) {
+      btn.addEventListener('pointermove', function (e) {
+        var r = btn.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        var dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+        var dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+        btn.style.setProperty('--bx', (dx * MAGNET).toFixed(2) + 'px');
+        btn.style.setProperty('--by', (dy * MAGNET).toFixed(2) + 'px');
+      });
+      btn.addEventListener('pointerleave', function () {
+        btn.style.setProperty('--bx', '0px');
+        btn.style.setProperty('--by', '0px');
+      });
+    });
+  }
+
+  /* ---------- 9. 作品封面大图预览 ---------- */
+  var lightbox = document.getElementById('lightbox');
+  var lbImg = document.getElementById('lbImg');
+  var lbCaption = document.getElementById('lbCaption');
+  var lbClose = document.getElementById('lbClose');
+  var thumbs = Array.prototype.slice.call(document.querySelectorAll('.thumb'));
+  var lastFocused = null;
+
+  function openLightbox(thumb) {
+    var img = thumb.querySelector('img');
+    if (!img || !lightbox) return;
+
+    var card = thumb.closest ? thumb.closest('.project') : null;
+    var title = card ? card.querySelector('h3') : null;
+
+    lbImg.setAttribute('src', img.currentSrc || img.src);
+    lbImg.setAttribute('alt', img.getAttribute('alt') || '');
+    lbCaption.textContent = title ? title.textContent.trim() : '';
+
+    lastFocused = document.activeElement;
+    lightbox.hidden = false;
+    void lightbox.offsetHeight; // 触发重排，让透明度过渡从 0 开始
+    lightbox.classList.add('is-open');
+    document.body.classList.add('no-scroll');
+    if (lbClose) lbClose.focus();
+  }
+
+  function closeLightbox() {
+    if (!lightbox || lightbox.hidden) return;
+
+    lightbox.classList.remove('is-open');
+    document.body.classList.remove('no-scroll');
+    window.setTimeout(function () {
+      lightbox.hidden = true;
+      lbImg.setAttribute('src', '');
+    }, 280);
+
+    if (lastFocused && lastFocused.focus) lastFocused.focus();
+  }
+
+  if (lightbox && thumbs.length && lbImg && lbClose) {
+    thumbs.forEach(function (thumb) {
+      var img = thumb.querySelector('img');
+      var desc = img && img.getAttribute('alt') ? img.getAttribute('alt') : '作品封面';
+
+      thumb.setAttribute('role', 'button');
+      thumb.setAttribute('tabindex', '0');
+      thumb.setAttribute('aria-label', '查看大图：' + desc);
+
+      thumb.addEventListener('click', function () { openLightbox(thumb); });
+      thumb.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+          e.preventDefault();
+          openLightbox(thumb);
+        }
+      });
+    });
+
+    lbClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', function (e) {
+      // 点遮罩空白处关闭，点图片本身不关
+      if (e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
+    });
+  }
 })();
