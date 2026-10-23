@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ovo-pwp · 作品集</title>
+  <meta name="description" content="ovo-pwp 的个人作品集：Spring Boot + Vue 3 全栈应用、数据看板与 Python 数据分析项目。" />
+
+  <!-- 主题初始化：在渲染前应用，避免闪烁 -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header" id="siteHeader">
+    <div class="wrap header-inner">
+      <a class="logo" href="#top" aria-label="回到顶部">ovo-pwp<span class="dot">.</span></a>
+
+      <nav class="nav" id="nav" aria-label="主导航">
+        <a href="#about">关于</a>
+        <a href="#work">作品</a>
+        <a href="#contact">联系</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="切换深浅色主题" title="切换主题">
+          <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2" />
+            <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6" />
+          </svg>
+          <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 14.2A8.4 8.4 0 0 1 9.8 4a8.6 8.6 0 1 0 10.2 10.2Z" />
+          </svg>
+        </button>
+
+        <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero wrap" id="top">
+      <p class="eyebrow reveal">全栈开发 · 数据看板 · 数据分析</p>
+      <h1 class="hero-title reveal">
+        你好，我是 ovo-pwp。<br />
+        把想法做成<em>打开就能用</em>的东西。
+      </h1>
+      <p class="hero-lead reveal">
+        从 Spring Boot + Vue 3 的前后端分离系统、数据看板，到 Python 数据分析与可视化。
+        下面这些项目都是我独立完成的，代码与线上演示都在 GitHub。
+      </p>
+      <div class="hero-cta reveal">
+        <a class="btn btn-primary" href="#work">查看作品</a>
+        <a class="btn btn-ghost" href="https://github.com/ovo-pwp" target="_blank" rel="noopener noreferrer">GitHub 主页</a>
+      </div>
+
+      <ul class="stats reveal">
+        <li><strong>9</strong><span>公开仓库</span></li>
+        <li><strong>4</strong><span>主要语言</span></li>
+        <li><strong>6</strong><span>在线演示</span></li>
+      </ul>
+    </section>
+
+    <!-- 关于 -->
+    <section class="section wrap" id="about">
+      <header class="section-head reveal">
+        <span class="section-index">01</span>
+        <h2>关于我</h2>
+      </header>
+
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <p>
+            我是 ovo-pwp，做前后端分离的全栈开发，也写数据分析。喜欢把一个完整的想法
+            从界面一直做到数据库——「心屿」用 Spring Boot 3.2 + Vue 3 实现了患者、咨询师、
+            管理员三种角色的心理健康系统，AI 对话走通义千问并按 SSE 流式返回；
+            「云端看板」则用 Vue 3 + Express + PostgreSQL 做销售回款的多维分析。
+          </p>
+          <p>
+            另一条线是数据与展示：用 Python 做共享单车、电商销售趋势与销量预测的分析，
+            也写了一些直接用浏览器打开的网页作品——校园双校区数据看板、青少年情绪减压工具，
+            以及免费无广告的多语言学习平台 LingoHub。
+          </p>
+        </div>
+
+        <div class="about-side reveal">
+          <h3>技术栈</h3>
+          <ul class="tags">
+            <li>Spring Boot 3</li>
+            <li>Java 21</li>
+            <li>MyBatis-Plus</li>
+            <li>Sa-Token</li>
+            <li>Vue 3</li>
+            <li>Vite</li>
+            <li>Element Plus</li>
+            <li>Express</li>
+            <li>PostgreSQL</li>
+            <li>MySQL</li>
+            <li>Python</li>
+            <li>数据分析</li>
+            <li>ECharts</li>
+            <li>原生 HTML / CSS</li>
+          </ul>
+
+          <h3>项目脉络</h3>
+          <ul class="timeline">
+            <li>
+              <span class="tl-year">2026-10</span>
+              <span class="tl-title">心屿 · AI 心理健康咨询系统</span>
+            </li>
+            <li>
+              <span class="tl-year">2026-10</span>
+              <span class="tl-title">云端看板 · 销售回款多维分析</span>
+            </li>
+            <li>
+              <span class="tl-year">2026-07</span>
+              <span class="tl-title">数据分析三件套 + 校园数据看板</span>
+            </li>
+            <li>
+              <span class="tl-year">2026-06</span>
+              <span class="tl-title">情绪补给站 · LingoHub</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 作品 -->
+    <section class="section wrap" id="work">
+      <header class="section-head reveal">
+        <span class="section-index">02</span>
+        <h2>作品</h2>
+      </header>
+
+      <!-- 分类按钮由 main.js 依据项目实际的 data-cat 生成 -->
+      <div class="filters reveal" id="filters" role="tablist" aria-label="作品分类筛选" hidden></div>
+
+      <div class="projects" id="projects">
+        <!-- 1. 心屿 -->
+        <article class="project reveal" data-cat="fullstack">
+          <div class="thumb">
+            <img
+              src="assets/img/covers/mindharbor.jpg"
+              alt="心屿患者端首页：问候卡片、情绪概览与推荐练习"
+              width="960" height="720" loading="lazy" />
+          </div>
+
+          <div class="project-body">
+            <div class="project-top">
+              <h3><a href="https://github.com/ovo-pwp/mindharbor" target="_blank" rel="noopener noreferrer">心屿 MindHarbor</a></h3>
+              <span class="year">★ 1</span>
+            </div>
+
+            <p class="project-repo">ovo-pwp/mindharbor · Java · 2026-10-22</p>
+
+            <p>
+              AI 心理健康咨询系统，Spring Boot 3.2 + Vue 3 前后端分离，覆盖患者、咨询师、
+              管理员三种角色的完整业务闭环。AI 对话走通义千问并按 SSE 流式返回，
+              无 Key 时自动降级为本地共情引擎；含 SDS / SAS 心理测评的自动计分与分级。
+            </p>
+
+            <ul class="chips">
+              <li>Spring Boot 3.2</li>
+              <li>Vue 3</li>
+              <li>MyBatis-Plus</li>
+              <li>Sa-Token</li>
+              <li>通义千问</li>
+            </ul>
+
+            <div class="project-links">
+              <a href="https://github.com/ovo-pwp/mindharbor" target="_blank" rel="noopener noreferrer">源码 ↗</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 2. 云端看板 -->
+        <article class="project reveal" data-cat="fullstack">
+          <div class="thumb">
+            <img
+              src="assets/img/covers/cloud-dashboard.jpg"
+              alt="云端看板登录页：左侧品牌介绍，右侧账号登录表单"
+              width="960" height="720" loading="lazy" />
+          </div>
+
+          <div class="project-body">
+            <div class="project-top">
+              <h3><a href="https://github.com/ovo-pwp/cloud-dashboard" target="_blank" rel="noopener noreferrer">云端看板</a></h3>
+              <span class="year">2026-10-21</span>
+            </div>
+
+            <p class="project-repo">ovo-pwp/cloud-dashboard · JavaScript</p>
+
+            <p>
+              销售回款管理看板。数据从金山文档云端抓取或手动导入 Excel，进 PostgreSQL 后
+              按业务员、客户、账龄多维查看。区分已开票未回款、已发货未开票、客户平台未回款
+              三种口径，全站需登录并记录登录审计。
+            </p>
+
+            <ul class="chips">
+              <li>Vue 3</li>
+              <li>Vite</li>
+              <li>Element Plus</li>
+              <li>Express 5</li>
+              <li>PostgreSQL</li>
+            </ul>
+
+            <div class="project-links">
+              <a href="https://github.com/ovo-pwp/cloud-dashboard" target="_blank" rel="noopener noreferrer">源码 ↗</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 3. 校园数据看板 -->
+        <article class="project reveal" data-cat="web">
+          <div class="thumb">
+            <img
+              src="assets/img/covers/campus-dashboard.jpg"
+              alt="校园数据看板：在校学生与食堂用餐等指标卡，以及东西校区对比"
+              width="960" height="720" loading="lazy" />
+          </div>
+
+          <div class="project-body">
+            <div class="project-top">
+              <h3><a href="https://github.com/ovo-pwp/campus-dashboard" target="_blank" rel="noopener noreferrer">校园数据看板</a></h3>
+              <span class="year">2026-07-27</span>
+            </div>
+
+            <p class="project-repo">ovo-pwp/campus-dashboard · HTML</p>
+
+            <p>
+              学校双校区的数据总览：在校学生、日均食堂用餐、图书馆容量与上座率、
+              报修响应时长，东西校区关键指标并排对比。
+            </p>
+
+            <ul class="chips">
+              <li>HTML</li>
+              <li>数据可视化</li>
+              <li>双校区对比</li>
+            </ul>
+
+            <div class="project-links">
+              <a href="https://github.com/ovo-pwp/campus-dashboard" target="_blank" rel="noopener noreferrer">源码 ↗</a>
+              <a href="https://ovo-pwp.github.io/campus-dashboard/" target="_blank" rel="noopener noreferrer">在线体验 ↗</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 4. 情绪补给站 -->
+        <article class="project reveal" data-cat="web">
+          <div class="thumb">
+            <img
+              src="assets/img/covers/emotion-station.jpg"
+              alt="情绪补给站：输入框、情绪程度选择与送出按钮"
+              width="960" height="720" loading="lazy" />
+          </div>
+
+          <div class="project-body">
+            <div class="project-top">
+              <h3><a href="https://github.com/ovo-pwp/emotion-station" target="_blank" rel="noopener noreferrer">情绪补给站</a></h3>
+              <span class="year">2026-06-28</span>
+            </div>
+
+            <p class="project-repo">ovo-pwp/emotion-station · HTML</p>
+
+            <p>
+              面向青少年的情绪减压小工具。把扎心的话写下来，点一个当下的难过程度，
+              由「云朵」接住并给出回应——先安抚情绪，再一起看清背后的意思。
+            </p>
+
+            <ul class="chips">
+              <li>HTML</li>
+              <li>原生 JS</li>
+              <li>心理安抚</li>
+            </ul>
+
+            <div class="project-links">
+              <a href="https://github.com/ovo-pwp/emotion-station" target="_blank" rel="noopener noreferrer">源码 ↗</a>
+              <a href="https://ovo-pwp.github.io/emotion-station/" target="_blank" rel="noopener noreferrer">在线体验 ↗</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 5. LingoHub -->
+        <article class="project reveal" data-cat="web">
+          <div class="thumb">
+            <img
+              src="assets/img/covers/green.jpg"
+              alt="LingoHub 闪卡模式界面：显示单词及其释义"
+              width="960" height="720" loading="lazy" />
+          </div>
+
+          <div class="project-body">
+            <div class="project-top">
+              <h3><a href="https://github.com/ovo-pwp/green" target="_blank" rel="noopener noreferrer">LingoHub</a></h3>
+              <span class="year">★ 1</span>
+            </div>
+
+            <p class="project-repo">ovo-pwp/green · JavaScript · 2026-06-13</p>
+
+            <p>
+              免费、无广告的多语言学习平台，帮你高效背单词、练习语法。
+              纯原生 HTML / CSS / JavaScript 实现，含闪卡与测验两种模式，
+              支持中英界面切换，学习进度保存在浏览器本地，MIT 协议开源。
+            </p>
+
+            <ul class="chips">
+              <li>原生 JS</li>
+              <li>闪卡 / 测验</li>
+              <li>中英双语 UI</li>
+              <li>MIT</li>
+            </ul>
+
+            <div class="project-links">
+              <a href="https://github.com/ovo-pwp/green" target="_blank" rel="noopener noreferrer">源码 ↗</a>
+              <a href="https://ovo-pwp.github.io/green/" target="_blank" rel="noopener noreferrer">在线体验 ↗</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 6. 共享单车分析 -->
+        <article class="project reveal" data-cat="data">
+          <div class="thumb">
+            <img
+              src="assets/img/covers/bike-share-analysis.jpg"
+              alt="共享单车分析项目的可视化页面"
+              width="960" height="720" loading="lazy" />
+          </div>
+
+          <div class="project-body">
+            <div class="project-top">
+              <h3><a href="https://github.com/ovo-pwp/bike-share-analysis" target="_blank" rel="noopener noreferrer">共享单车分析</a></h3>
+              <span class="year">2026-07-27</span>
+            </div>
+
+            <p class="project-repo">ovo-pwp/bike-share-analysis · Python</p>
+
+            <p>
+              共享单车骑行数据的分析项目，从数据清洗到指标统计，
+              结果以可视化页面呈现。
+            </p>
+
+            <ul class="chips">
+              <li>Python</li>
+              <li>数据分析</li>
+            </ul>
+
+            <div class="project-links">
+              <a href="https://github.com/ovo-pwp/bike-share-analysis" target="_blank" rel="noopener noreferrer">源码 ↗</a>
+              <a href="https://ovo-pwp.github.io/bike-share-analysis/" target="_blank" rel="noopener noreferrer">在线体验 ↗</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 7. 销售预测 -->
+        <article class="project reveal" data-cat="data">
+          <div class="thumb">
+            <img
+              src="assets/img/covers/sales-forecasting.jpg"
+              alt="销售预测项目的趋势图与销量预测页面"
+              width="960" height="720" loading="lazy" />
+          </div>
+
+          <div class="project-body">
+            <div class="project-top">
+              <h3><a href="https://github.com/ovo-pwp/sales-forecasting" target="_blank" rel="noopener noreferrer">销售预测</a></h3>
+              <span class="year">2026-07-27</span>
+            </div>
+
+            <p class="project-repo">ovo-pwp/sales-forecasting · Python</p>
+
+            <p>
+              电商销售趋势分析与销量预测，看历史走势、做未来预估。
+            </p>
+
+            <ul class="chips">
+              <li>Python</li>
+              <li>趋势分析</li>
+              <li>销量预测</li>
+            </ul>
+
+            <div class="project-links">
+              <a href="https://github.com/ovo-pwp/sales-forecasting" target="_blank" rel="noopener noreferrer">源码 ↗</a>
+              <a href="https://ovo-pwp.github.io/sales-forecasting/" target="_blank" rel="noopener noreferrer">在线体验 ↗</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 8. 电子商务分析 -->
+        <article class="project reveal" data-cat="data">
+          <div class="thumb">
+            <img
+              src="assets/img/covers/ecommerce-analytics.jpg"
+              alt="电子商务分析项目的图表页面"
+              width="960" height="720" loading="lazy" />
+          </div>
+
+          <div class="project-body">
+            <div class="project-top">
+              <h3><a href="https://github.com/ovo-pwp/ecommerce-analytics" target="_blank" rel="noopener noreferrer">电子商务分析</a></h3>
+              <span class="year">2026-07-27</span>
+            </div>
+
+            <p class="project-repo">ovo-pwp/ecommerce-analytics · Python</p>
+
+            <p>
+              电子商务数据的分析项目，围绕订单与销售指标做统计与可视化。
+            </p>
+
+            <ul class="chips">
+              <li>Python</li>
+              <li>数据分析</li>
+            </ul>
+
+            <div class="project-links">
+              <a href="https://github.com/ovo-pwp/ecommerce-analytics" target="_blank" rel="noopener noreferrer">源码 ↗</a>
+              <a href="https://ovo-pwp.github.io/ecommerce-analytics/" target="_blank" rel="noopener noreferrer">在线体验 ↗</a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <p class="empty-hint" id="emptyHint" hidden>该分类下暂时没有项目。</p>
+    </section>
+
+    <!-- 联系 -->
+    <section class="section wrap" id="contact">
+      <header class="section-head reveal">
+        <span class="section-index">03</span>
+        <h2>联系我</h2>
+      </header>
+
+      <div class="contact-card reveal">
+        <p class="contact-lead">
+          想聊项目、交换想法，或者只是想认识一下？来 GitHub 找我就行。
+        </p>
+        <a class="mail" href="https://github.com/ovo-pwp" target="_blank" rel="noopener noreferrer">github.com/ovo-pwp</a>
+        <ul class="socials">
+          <li><a href="https://github.com/ovo-pwp" target="_blank" rel="noopener noreferrer">GitHub 主页</a></li>
+          <li><a href="https://github.com/ovo-pwp/mindharbor" target="_blank" rel="noopener noreferrer">心屿 MindHarbor</a></li>
+          <li><a href="https://ovo-pwp.github.io/green/" target="_blank" rel="noopener noreferrer">LingoHub 在线体验</a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span>© <span id="year">2026</span> ovo-pwp. 保留所有权利。</span>
+      <a href="#top" class="to-top">回到顶部 ↑</a>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
