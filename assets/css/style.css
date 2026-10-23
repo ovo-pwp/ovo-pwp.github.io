@@ -65,6 +65,9 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 88px;
   -webkit-text-size-adjust: 100%;
+  /* 悬停提示气泡可能超出视口边缘；用 clip 而非 hidden，
+     这样不会把根元素变成滚动容器，顶栏的 sticky 依然有效 */
+  overflow-x: clip;
 }
 
 body {
