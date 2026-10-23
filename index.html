@@ -22,7 +22,17 @@
 <body>
   <a class="skip-link" href="#main">跳到主要内容</a>
 
+  <!-- 背景层：细网格纹理 + 缓慢流动的渐变光 -->
+  <div class="bg-decor" aria-hidden="true">
+    <div class="bg-grid"></div>
+    <div class="bg-aurora"></div>
+  </div>
+
+  <!-- 跟随光标的柔光晕 -->
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
   <header class="site-header" id="siteHeader">
+    <div class="read-progress" id="readProgress" aria-hidden="true"></div>
     <div class="wrap header-inner">
       <a class="logo" href="#top" aria-label="回到顶部">ovo-pwp<span class="dot">.</span></a>
 
@@ -54,16 +64,16 @@
   <main id="main">
     <!-- Hero -->
     <section class="hero wrap" id="top">
-      <p class="eyebrow reveal">全栈开发 · 数据看板 · 数据分析</p>
-      <h1 class="hero-title reveal">
-        你好，我是 ovo-pwp。<br />
-        把想法做成<em>打开就能用</em>的东西。
+      <p class="eyebrow hero-in">全栈开发 · 数据看板 · 数据分析</p>
+      <h1 class="hero-title">
+        <span class="line"><span class="line-inner">你好，我是 ovo-pwp。</span></span>
+        <span class="line"><span class="line-inner">把想法做成<em>打开就能用</em>的东西。</span></span>
       </h1>
-      <p class="hero-lead reveal">
+      <p class="hero-lead hero-in">
         从 Spring Boot + Vue 3 的前后端分离系统、数据看板，到 Python 数据分析与可视化。
         下面这些项目都是我独立完成的，代码与线上演示都在 GitHub。
       </p>
-      <div class="hero-cta reveal">
+      <div class="hero-cta hero-in">
         <a class="btn btn-primary" href="#work">查看作品</a>
         <a class="btn btn-ghost" href="https://github.com/ovo-pwp" target="_blank" rel="noopener noreferrer">GitHub 主页</a>
       </div>
@@ -463,6 +473,17 @@
       <a href="#top" class="to-top">回到顶部 ↑</a>
     </div>
   </footer>
+
+  <!-- 作品封面大图预览 -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="作品封面预览" hidden>
+    <button class="lb-close" id="lbClose" type="button" aria-label="关闭预览">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+    </button>
+    <figure class="lb-figure">
+      <img id="lbImg" src="" alt="" />
+      <figcaption id="lbCaption"></figcaption>
+    </figure>
+  </div>
 
   <script src="assets/js/main.js"></script>
 </body>
