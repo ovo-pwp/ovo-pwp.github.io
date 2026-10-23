@@ -2,6 +2,7 @@
    ovo-pwp · 个人作品集 · 交互脚本
    1) 主题切换  2) 滚动显现  3) 导航高亮  4) 移动菜单  5) 作品筛选  6) 页脚年份
    7) 阅读进度与背景视差  8) 统计数字滚动  9) 指针交互  10) 封面大图预览
+   11) Micro 交互：回弹开关 / 复制反馈 / 3D 翻转卡片
    ========================================================================== */
 (function () {
   'use strict';
@@ -16,6 +17,16 @@
       var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       root.setAttribute('data-theme', next);
       try { localStorage.setItem('theme', next); } catch (e) {}
+
+      // 回弹反馈：先移除再重排，保证连续点击也能重新播放
+      if (prefersReduced) return;
+      themeToggle.classList.remove('is-squish');
+      void themeToggle.offsetWidth;
+      themeToggle.classList.add('is-squish');
+    });
+
+    themeToggle.addEventListener('animationend', function () {
+      themeToggle.classList.remove('is-squish');
     });
   }
 
@@ -369,4 +380,151 @@
       if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
     });
   }
+
+  /* ---------- 11.1 复制反馈：成功后打勾 ---------- */
+  var copyBtn = document.getElementById('copyBtn');
+  if (copyBtn) {
+    var copyLabel = copyBtn.querySelector('.copy-label');
+    var originalLabel = copyLabel ? copyLabel.textContent : '';
+    var doneTimer = null;
+
+    // 同步复制：必须和点击在同一个任务里执行，才能吃到用户激活状态
+    function copySync(text) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      return ok;
+    }
+
+    function markDone(ok) {
+      if (copyLabel) copyLabel.textContent = ok ? '已复制' : '复制失败';
+      copyBtn.classList.remove('is-done');
+      void copyBtn.offsetWidth; // 重排，让描边动画可以重放
+      copyBtn.classList.add('is-done');
+
+      window.clearTimeout(doneTimer);
+      doneTimer = window.setTimeout(function () {
+        copyBtn.classList.remove('is-done');
+        if (copyLabel) copyLabel.textContent = originalLabel;
+      }, 2000);
+    }
+
+    copyBtn.addEventListener('click', function () {
+      var text = copyBtn.getAttribute('data-copy') || '';
+      var settled = false;
+
+      function finish(ok) {
+        if (settled) return;
+        settled = true;
+        markDone(ok);
+      }
+
+      // 先走同步方案，能立刻给出反馈
+      if (copySync(text)) { finish(true); return; }
+
+      // 退回 Clipboard API（需要安全上下文 + 授权）
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(
+          function () { finish(true); },
+          function () { finish(false); }
+        );
+        // 少数环境（无头浏览器 / 未授权）promise 会一直悬挂，兜底避免按钮毫无反应
+        window.setTimeout(function () { finish(false); }, 1200);
+      } else {
+        finish(false);
+      }
+    });
+  }
+
+  /* ---------- 11.2 3D 翻转卡片 ----------
+     不改 8 张卡片的 HTML：在这里把封面与正文收进翻转内层，
+     背面内容直接取现有节点生成，避免结构重复维护。 */
+  var FLIP_ICON =
+    '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+    '<path d="M20.6 12a8.6 8.6 0 1 1-2.6-6.2" />' +
+    '<path d="M20.6 3.4v5.6h-5.6" />' +
+    '</svg>';
+
+  projectList.forEach(function (card) {
+    var thumb = card.querySelector('.thumb');
+    var body = card.querySelector('.project-body');
+    if (!thumb || !body) return;
+
+    /* 正面：接管卡片原有的全部子节点 */
+    var front = document.createElement('div');
+    front.className = 'flip-front';
+    while (card.firstChild) front.appendChild(card.firstChild);
+
+    /* 背面：从正面已搬过来的节点里取内容，做一份精简摘要 */
+    var titleLink = front.querySelector('.project-top h3 a');
+    var repoEl = front.querySelector('.project-repo');
+    var chipEls = front.querySelectorAll('.chips li');
+    var linkEls = front.querySelectorAll('.project-links a');
+
+    var back = document.createElement('div');
+    back.className = 'flip-back';
+
+    var h4 = document.createElement('h4');
+    h4.textContent = titleLink ? titleLink.textContent.trim() : '作品详情';
+    back.appendChild(h4);
+
+    if (repoEl) {
+      var meta = document.createElement('p');
+      meta.className = 'fb-meta';
+      meta.textContent = repoEl.textContent.trim();
+      back.appendChild(meta);
+    }
+
+    if (chipEls.length) {
+      var h5 = document.createElement('h5');
+      h5.textContent = '技术标签';
+      back.appendChild(h5);
+
+      var chipList = document.createElement('ul');
+      chipList.className = 'chips';
+      Array.prototype.forEach.call(chipEls, function (chip) {
+        var li = document.createElement('li');
+        li.textContent = chip.textContent.trim();
+        chipList.appendChild(li);
+      });
+      back.appendChild(chipList);
+    }
+
+    if (linkEls.length) {
+      var links = document.createElement('div');
+      links.className = 'fb-links';
+      Array.prototype.forEach.call(linkEls, function (a) {
+        links.appendChild(a.cloneNode(true));
+      });
+      back.appendChild(links);
+    }
+
+    var inner = document.createElement('div');
+    inner.className = 'flip-inner';
+    inner.appendChild(front);
+    inner.appendChild(back);
+    card.appendChild(inner);
+
+    /* 翻转按钮固定挂在 .project 上，不跟着内层旋转，正反面都能点 */
+    var flipBtn = document.createElement('button');
+    flipBtn.type = 'button';
+    flipBtn.className = 'flip-btn';
+    flipBtn.setAttribute('aria-label', '翻转卡片查看标签与链接');
+    flipBtn.innerHTML = FLIP_ICON;
+    card.appendChild(flipBtn);
+
+    flipBtn.addEventListener('click', function () {
+      var flipped = card.classList.toggle('is-flipped');
+      flipBtn.setAttribute('aria-label', flipped ? '返回作品封面' : '翻转卡片查看标签与链接');
+    });
+  });
 })();

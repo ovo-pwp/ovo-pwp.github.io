@@ -15,8 +15,13 @@
   --text-mute: #8b8f97;
   --accent: #1f4fff;
   --accent-soft: rgba(31, 79, 255, 0.08);
+  --shadow-sm: 0 1px 2px rgba(16, 18, 22, 0.05);
   --shadow: 0 1px 2px rgba(16, 18, 22, 0.04), 0 8px 24px -12px rgba(16, 18, 22, 0.12);
   --shadow-lg: 0 2px 4px rgba(16, 18, 22, 0.05), 0 24px 48px -24px rgba(16, 18, 22, 0.22);
+
+  /* 悬停提示气泡 */
+  --tip-bg: #14161a;
+  --tip-text: #ffffff;
 
   --radius: 14px;
   --radius-sm: 9px;
@@ -42,8 +47,13 @@
   --text-mute: #767d88;
   --accent: #7c9bff;
   --accent-soft: rgba(124, 155, 255, 0.12);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.4), 0 24px 48px -24px rgba(0, 0, 0, 0.75);
+
+  /* 悬停提示气泡（深色下反相） */
+  --tip-bg: #eff1f4;
+  --tip-text: #14161a;
 }
 
 /* ---------- 2. 基础重置 ---------- */
@@ -219,27 +229,6 @@ p:last-child { margin-bottom: 0; }
 /* ---------- 4. Hero ---------- */
 .hero { padding: clamp(72px, 13vw, 140px) var(--gutter) clamp(56px, 8vw, 96px); }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 26px;
-  padding: 6px 14px;
-  font-size: 13px;
-  color: var(--text-soft);
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-}
-.eyebrow::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #22b573;
-  box-shadow: 0 0 0 3px rgba(34, 181, 115, 0.18);
-}
-
 .hero-title {
   font-size: clamp(32px, 5.6vw, 56px);
   font-weight: 600;
@@ -395,7 +384,8 @@ p:last-child { margin-bottom: 0; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
-  overflow: hidden;
+  /* 这里不能加 overflow: hidden —— 它会切断翻转卡片的 3D 上下文。
+     圆角裁切交给 .flip-front / .flip-back 各自处理 */
   transition: transform 0.32s var(--ease), box-shadow 0.32s var(--ease),
     border-color 0.32s var(--ease), opacity 0.28s var(--ease);
 }
@@ -515,6 +505,8 @@ p:last-child { margin-bottom: 0; }
   transition: color 0.24s var(--ease), background-size 0.24s var(--ease);
 }
 .mail:hover { color: var(--accent); background-size: 0 1px; }
+
+.contact-actions { margin: -8px 0 26px; }
 
 .socials { display: flex; flex-wrap: wrap; gap: 10px; }
 .socials a {
@@ -835,7 +827,264 @@ body.no-scroll { overflow: hidden; }
   .contact-card { padding: 24px 20px; }
 }
 
-/* ---------- 12. 无障碍 / 打印 ---------- */
+/* ==========================================================================
+   12. Micro 交互（原生重写）
+   12.1 悬停提示 Warm Tooltip  12.2 状态标记 Status Mark
+   12.3 回弹开关 Squish Switch 12.4 打勾反馈 Spring Check
+   12.5 3D 翻转卡片 Flip Card
+   ========================================================================== */
+
+/* ---------- 12.1 悬停提示 ---------- */
+[data-tip] {
+  position: relative;
+}
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 9px);
+  translate: -50% 4px;
+  padding: 7px 11px;
+  width: max-content;
+  max-width: 210px;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  color: var(--tip-text);
+  background: var(--tip-bg);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease), translate 0.2s var(--ease);
+  z-index: 20;
+}
+/* 小三角 */
+[data-tip]::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 4px);
+  translate: -50% 4px;
+  border: 5px solid transparent;
+  border-top-color: var(--tip-bg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease), translate 0.2s var(--ease);
+  z-index: 21;
+}
+@media (hover: hover) {
+  [data-tip]:hover::after,
+  [data-tip]:focus-visible::after { opacity: 1; translate: -50% 0; }
+  [data-tip]:hover::before,
+  [data-tip]:focus-visible::before { opacity: 1; translate: -50% 0; }
+}
+
+/* ---------- 12.2 状态标记 ---------- */
+.status-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 15px 7px 13px;
+  font-size: 13px;
+  color: var(--text-soft);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+}
+.status-mark .dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--accent);
+}
+/* 呼吸光环，暗示「活跃」 */
+.status-mark .dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: dotPulse 2.4s var(--ease) infinite;
+}
+@keyframes dotPulse {
+  0% { scale: 1; opacity: 0.5; }
+  70% { scale: 3.2; opacity: 0; }
+  100% { scale: 3.2; opacity: 0; }
+}
+
+/* 首屏状态标记 */
+.hero .status-mark { margin: 0 0 26px; }
+
+/* ---------- 12.3 回弹开关 ---------- */
+.theme-toggle.is-squish { animation: squish 0.42s var(--ease); }
+@keyframes squish {
+  0% { scale: 1 1; }
+  32% { scale: 0.82 1.16; }
+  62% { scale: 1.14 0.87; }
+  82% { scale: 0.96 1.05; }
+  100% { scale: 1 1; }
+}
+.theme-toggle svg { transition: rotate 0.42s var(--ease), scale 0.42s var(--ease); }
+
+/* ---------- 12.4 打勾反馈 ---------- */
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 17px;
+  font-size: 14px;
+  color: var(--text-soft);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  transition: color 0.22s var(--ease), border-color 0.22s var(--ease),
+    background-color 0.22s var(--ease), transform 0.18s var(--ease);
+}
+.copy-btn:hover { color: var(--text); border-color: var(--border-strong); }
+.copy-btn:active { transform: scale(0.97); }
+.copy-btn .check {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+.copy-btn .check path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* 默认不画出来；复制成功后由 JS 加 .is-done 触发描边动画 */
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+}
+.copy-btn.is-done { color: var(--accent); border-color: var(--accent); }
+.copy-btn.is-done .check path {
+  animation: drawCheck 0.42s var(--ease) 0.04s forwards;
+}
+.copy-btn.is-done .check { animation: springPop 0.5s var(--ease); }
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes springPop {
+  0% { scale: 0.5; }
+  42% { scale: 1.26; }
+  70% { scale: 0.94; }
+  100% { scale: 1; }
+}
+
+/* ---------- 12.5 3D 翻转卡片 ---------- */
+.project {
+  position: relative;
+  /* 让子元素（翻转内层）获得透视 */
+  perspective: 1500px;
+}
+
+/* 悬浮在封面右上角，正面与背面都能点到 */
+.flip-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 4;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: #fff;
+  background: rgba(18, 20, 24, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 50%;
+  transition: background-color 0.2s var(--ease), rotate 0.42s var(--ease);
+}
+.flip-btn:hover { background: rgba(18, 20, 24, 0.78); }
+.flip-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+/* 翻到背面时图标掉头 */
+.project.is-flipped .flip-btn { rotate: 180deg; }
+
+.flip-inner {
+  position: relative;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.72s var(--ease);
+}
+.project.is-flipped .flip-inner { transform: rotateY(180deg); }
+
+/* 两面都自己裁圆角，替代原本挂在 .project 上的 overflow: hidden */
+.flip-front,
+.flip-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: calc(var(--radius) - 1px);
+  overflow: hidden;
+}
+.flip-front {
+  position: relative;
+  height: 100%;
+  background: var(--surface);
+}
+
+.flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px 24px 28px;
+  background:
+    radial-gradient(120% 90% at 18% 0%, var(--accent-soft), transparent 62%),
+    var(--surface);
+}
+.flip-back h4 {
+  font-size: 16.5px;
+  letter-spacing: -0.01em;
+}
+.flip-back .fb-meta {
+  font-size: 12.5px;
+  color: var(--text-mute);
+  margin-top: -10px;
+}
+.flip-back h5 {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: -8px;
+}
+.flip-back .chips li {
+  border-color: color-mix(in srgb, var(--accent) 32%, var(--border));
+  color: var(--text-soft);
+}
+.flip-back .fb-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 2px;
+}
+.flip-back .fb-links a {
+  padding: 8px 15px;
+  font-size: 13.5px;
+  color: var(--text);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease),
+    background-color 0.2s var(--ease);
+}
+.flip-back .fb-links a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ---------- 13. 无障碍 / 打印 ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *,
@@ -854,14 +1103,20 @@ body.no-scroll { overflow: hidden; }
   .project { transform: none; }
   .lightbox img { scale: 1; }
   .btn { transform: none; }
+  /* Micro 交互：保留静态外观，去掉动画 */
+  .status-mark .dot::after { animation: none; opacity: 0; }
+  .flip-inner { transition: none; }
+  [data-tip]::after, [data-tip]::before { display: none; }
 }
 
 @media print {
   .site-header, .site-footer, .filters, .hero-cta { display: none; }
-  .bg-decor, .cursor-glow, .read-progress, .lightbox { display: none !important; }
+  .bg-decor, .cursor-glow, .read-progress, .lightbox, .flip-btn { display: none !important; }
   body { background: #fff; color: #000; }
   .reveal { opacity: 1; translate: none; }
   .hero-in { opacity: 1; }
   .hero-title .line-inner { transform: none; }
   .project { transform: none; }
+  /* 打印时只出正面，避免背面内容重叠 */
+  .flip-back { display: none; }
 }
